@@ -251,7 +251,7 @@ Tone rules:
             }
         }
 
-        const EMBEDDED_API_KEY = "AIzaSyBCB9FvGsT1bg-rxRpujG3h930f7qTs4sk"; // PASTE YOUR KEY HERE for personal use
+        const EMBEDDED_API_KEY = ""; // PASTE YOUR KEY HERE for personal use
 
         async function handleSendMsg(text) {
             if (!text.trim()) return;
