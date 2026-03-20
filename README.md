@@ -1,11 +1,11 @@
-
 # ॐ Bhakti Sangam — Morning Devotional Music Website
 
 > A clean, ad-free Hindu devotional music web app built for a boomer dad's morning routine. Powered by Gemini AI.
 
-![Status](https://img.shields.io/badge/status-in%20development-orange)
-![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20Gemini%20API-yellow)
-![Deploy](https://img.shields.io/badge/deploy-Antigravity-red)
+![Status](https://img.shields.io/badge/status-live-brightgreen)
+![Stack](https://img.shields.io/badge/stack-HTML%20%2B%20Gemini%20API%20%2B%20YouTube-yellow)
+![Deploy](https://img.shields.io/badge/deploy-Vercel-black)
+![Version](https://img.shields.io/badge/version-1.0%20MVP-orange)
 
 ---
 
@@ -13,35 +13,37 @@
 
 **Bhakti Sangam** (भक्ति संगम) is a single-page devotional music website designed for Hindu devotees — especially elderly users — to enjoy a peaceful, distraction-free morning prayer experience.
 
-Built by a CS student at KL University as a personal project for his father's daily morning routine.
+Built by a CS student at KL University as a surprise gift for his father's daily morning routine. From idea to deployment in 6 days.
 
 ---
 
-## ✨ Features (MVP)
+## ✨ Features (MVP v1.0)
 
 | Feature | Description |
 |---|---|
-| 🎵 **Song Player** | Spotify-style player with sidebar playlist, center now-playing panel, and persistent bottom controls |
+| 🎵 **Song Player** | Spotify-style layout — sidebar playlist, center now-playing panel, persistent bottom bar |
 | 🙏 **Morning Playlist** | 8 curated devotional songs — Hanuman Chalisa, Gayatri Mantra, Om Jai Jagdish, and more |
-| 🤖 **AI Pandit** | Gemini-powered chat assistant that explains bhajans, shares shlokas, and gives morning blessings |
-| 🌅 **Morning Greeting** | Time-aware greeting banner with daily blessing |
-| 🔍 **Search** | Filter songs by name or category from the sidebar |
-
-### 🗓️ Coming Soon (Post-MVP)
-- Deity filter (Shiva / Vishnu / Ganesh / Devi / Hanuman)
-- Language filter (Hindi / Telugu / Sanskrit)
-- Favorites / bookmarks
-- Lyrics display
+| 🔍 **YouTube Search** | Search any devotional song — results load with thumbnails, Up Next panel, recently played |
+| 🤖 **AI Pandit** | Gemini-powered chat — explains bhajans, shares shlokas, gives morning blessings |
+| 🌅 **Time-Based Greeting** | Morning / Afternoon / Evening / Night playlist labels with blessings |
+| 🕉️ **Deity Filter** | Filter songs by deity — Shiva, Vishnu, Ganesh, Devi, Hanuman |
+| 🌐 **Language Filter** | Filter by language — Hindi, Telugu, Sanskrit |
+| 📱 **Mobile Responsive** | Hamburger sidebar + AI Pandit toggle on mobile |
+| 🕐 **Recently Played** | Tracks last 5 played songs in sidebar |
+| 🔒 **Secure API Keys** | Keys stored via Vercel serverless functions — never exposed in code |
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** HTML5 + CSS3 + Vanilla JavaScript (single file)
-- **Audio:** YouTube embed (ad-supported for now, archive.org planned)
-- **AI:** Google Gemini API (`gemini-1.5-flash`)
-- **Fonts:** Google Fonts — Yatra One + Philosopher
-- **Hosting:** Antigravity IDE
+| Layer | Technology |
+|---|---|
+| UI | HTML5 + CSS3 + Vanilla JavaScript |
+| Audio | YouTube IFrame API |
+| AI Chat | Google Gemini API (via Vercel serverless) |
+| Search | YouTube Data API v3 (via Vercel serverless) |
+| Fonts | Google Fonts — Yatra One + Philosopher |
+| Hosting | Vercel |
 
 ---
 
@@ -49,21 +51,31 @@ Built by a CS student at KL University as a personal project for his father's da
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/YOUR_USERNAME/bhakti-sangam.git
-cd bhakti-sangam
+git clone https://github.com/Z4MZ3N0M/mini-proj-bhakti_sangam.git
+cd mini-proj-bhakti_sangam
 ```
 
-### 2. Add your Gemini API key
-Open `index.html` and find:
-```javascript
-const GEMINI_API_KEY = "YOUR_KEY_HERE";
+### 2. Create a .env file
 ```
-Replace with your key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+GEMINI_API_KEY=your_gemini_api_key
+YT_API_KEY=your_youtube_api_key
+```
 
-### 3. Open in browser
-Just open `index.html` directly in Chrome — no build step, no server needed.
+Get your Gemini key at: https://aistudio.google.com/app/apikey
 
-Or use [Antigravity IDE](https://antigravity.dev) for live preview.
+Get your YouTube key at: https://console.cloud.google.com
+
+### 3. Run locally
+Open `index.html` in Chrome directly or use a local server:
+```bash
+npx serve .
+```
+
+### 4. Deploy on Vercel
+1. Push to GitHub
+2. Import repo on vercel.com
+3. Add environment variables in Vercel settings
+4. Deploy
 
 ---
 
@@ -71,35 +83,43 @@ Or use [Antigravity IDE](https://antigravity.dev) for live preview.
 
 ```
 bhakti-sangam/
-├── index.html          ← Entire app (HTML + CSS + JS)
-├── README.md           ← This file
-└── bhakti-sangam.pptx  ← Project presentation
+├── index.html              ← Main HTML structure
+├── script.js               ← All JavaScript logic
+├── style.css               ← All styling
+├── api/
+│   ├── chat.js             ← Gemini API serverless function
+│   └── search.js           ← YouTube search serverless function
+├── vercel.json             ← Vercel routing config
+├── .gitignore              ← Ignores .env and node_modules
+├── README.md               ← This file
+└── bhakti-sangam.pptx      ← Project presentation
 ```
 
 ---
 
-## 📋 Build Plan
+## 🗺️ Roadmap (Post-MVP)
 
-| Day | Task | Status |
-|---|---|---|
-| Sat Mar 14 | Layout skeleton + theme + AI Pandit | ✅ Done |
-| Sun Mar 15 | YouTube audio + search bar | 🔄 In Progress |
-| Mon Mar 16 | Gemini chat polish + conversation history | ⏳ Pending |
-| Tue Mar 17 | Bug fixes + integration testing | ⏳ Pending |
-| Wed Mar 18 | Deity + language filters + mobile responsive | ⏳ Pending |
-| Thu Mar 19 | Deploy on Antigravity + shareable link | ⏳ Pending |
-| Fri Mar 20 | Buffer + share with dad 🎉 | ⏳ Pending |
+**V1.1 — Quick Wins**
+- [ ] Loop single song
+- [ ] Sleep timer
+- [ ] Mantra counter (108 click mala)
+- [ ] Auto-play at set morning time
+
+**V1.2 — Personalization (localStorage)**
+- [ ] Favourite songs
+- [ ] Add / remove from custom playlist
+- [ ] Persist preferences across sessions
+
+**V1.3 — Accounts + Cloud (Firebase/Supabase)**
+- [ ] Google login
+- [ ] Cloud saved playlists
+- [ ] Multiple profiles (Dad / Mom)
+- [ ] Add any YouTube song to personal playlist
 
 ---
 
 ## 🙏 Acknowledgements
 
-Built with love for a blessed morning routine.
+Built with love as a surprise gift for a devoted father's morning routine.
 
 **ॐ शान्तिः शान्तिः शान्तिः**
-
----
-
-## 📄 License
-
-MIT — free to use, share, and build upon.
