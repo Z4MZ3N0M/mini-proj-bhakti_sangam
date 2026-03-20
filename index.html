@@ -8,14 +8,17 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Philosopher:ital,wght@0,400;0,700;1,400&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
-    
+    <link rel="stylesheet" href="style.css?v=2" />
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 
 <body>
 
+    <div id="mobile-overlay"></div>
+
     <!-- TOP BAR -->
     <div id="topbar">
+        <button id="mobile-menu-btn" class="mobile-only" style="display:none;">☰</button>
         <div class="top-left">
             <span class="om">ॐ</span>
             <h1>Bhakti Sangam</h1>
@@ -27,6 +30,7 @@
         <div class="top-right">
             <span id="greeting"></span>
         </div>
+        <button id="mobile-ai-btn" class="mobile-only" style="display:none;">🤖</button>
     </div>
 
     <!-- MAIN -->
@@ -35,28 +39,57 @@
         <!-- SIDEBAR -->
         <div id="sidebar">
             <div id="sidebar-title">Morning Playlist</div>
+            <div id="deity-filters" class="deity-filters">
+                <button class="deity-btn active" data-deity="All">All</button>
+                <button class="deity-btn" data-deity="Shiva">🕉️ Shiva</button>
+                <button class="deity-btn" data-deity="Vishnu">🪷 Vishnu</button>
+                <button class="deity-btn" data-deity="Ganesh">🐘 Ganesh</button>
+                <button class="deity-btn" data-deity="Devi">🌸 Devi</button>
+                <button class="deity-btn" data-deity="Hanuman">🙏 Hanuman</button>
+            </div>
+            <div id="lang-filters" class="deity-filters" style="padding-top: 0;">
+                <button class="lang-btn active" data-lang="All">All</button>
+                <button class="lang-btn" data-lang="Hindi">हिंदी Hindi</button>
+                <button class="lang-btn" data-lang="Telugu">తెలుగు Telugu</button>
+                <button class="lang-btn" data-lang="Sanskrit">Sanskrit</button>
+            </div>
             <div id="song-list"></div>
+            
+            <div id="recent-title" style="display:none;">Recently Played</div>
+            <div id="recent-list"></div>
         </div>
 
         <!-- CENTER PANEL -->
         <div id="center">
             <div id="deity-art">🪔</div>
             
-            <button id="back-to-results" onclick="goBackToResults()">← Back to Results</button>
-            <div id="yt-player-container" style="display:none; width: 100%; max-width: 500px; height: 280px; border-radius: 12px; margin-bottom: 1.5rem; position: relative; z-index: 1; box-shadow: 0 0 30px rgba(255, 107, 0, 0.2); overflow: hidden;">
-                <div id="yt-player"></div>
+            <div id="playback-left">
+                <button id="back-to-results" onclick="history.back()">← Back to Results</button>
+                <div id="yt-player-container">
+                <div id="yt-player-overlay" style="display:none; position:absolute; inset:0; z-index:20; background-size:cover; background-position:center; cursor:pointer;">
+                    <div style="position:absolute; inset:0; background:rgba(0,0,0,0.3);"></div>
+                    <div id="yt-overlay-play-btn" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:80px; height:80px; background:#FF6B00; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:2rem; box-shadow:0 0 30px rgba(255,107,0,0.5); border:3px solid white;">▶</div>
+                </div>
+                <div id="yt-player-div"></div>
+            </div>
+
+            <div id="playing-info-panel">
+                <div id="now-playing-label" style="display:none;">Now Playing</div>
+                <div id="now-title">Bhakti Sangam</div>
+                <div id="now-sub">Select a song to begin your morning prayer</div>
+                <div class="now-tags">
+                    <span class="tag">#Devotional</span>
+                    <span class="tag">#Morning</span>
+                </div>
+            </div>
+
+            <button id="mobile-up-next-btn" class="mobile-only" style="display:none; width:100%; padding:10px; background:#2D1A0D; color:#FFB300; border:1px solid #FF6B00; border-radius:8px; margin-bottom:1rem;">⬆ Show Up Next</button>
             </div>
 
             <!-- YouTube Search Results Viewer -->
-            <div id="search-results-container"></div>
-            
-            <div id="now-title">Bhakti Sangam</div>
-            <div id="now-sub">Select a song to begin your morning prayer</div>
-            <div class="now-tags">
-                <span class="tag">#Devotional</span>
-                <span class="tag">#Morning</span>
+            <div id="playback-right">
+                <div id="search-results-container"></div>
             </div>
-            <div id="idle-msg">🙏 May your morning be blessed</div>
         </div>
 
         <!-- RIGHT PANEL / AI PANDIT -->
@@ -115,8 +148,6 @@
 
     <audio id="audio"></audio>
 
-    <!-- Load YouTube IFrame API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
 
     <script src="script.js"></script>
 

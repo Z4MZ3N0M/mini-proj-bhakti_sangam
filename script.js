@@ -1,149 +1,434 @@
-// Archive.org provided ad-free Devotional Music Links (verified)
         const songs = [
-            { title: "Hanuman Chalisa", cat: "Chalisa", deity: "🙏", tag: "#Bhakti", src: "https://archive.org/download/HanumanChalisa_201602/Hanuman%20Chalisa.mp3" },
-            { title: "Om Jai Jagdish Hare", cat: "Aarti", deity: "🪷", tag: "#Aarti", src: "https://archive.org/download/om_jai_jagdish_hare_aarti_bhakti_songs/om_jai_jagdish_hare_aarti_bhakti_songs.mp3" },
-            { title: "Gayatri Mantra", cat: "Mantra", deity: "🔆", tag: "#Mantra", src: "https://archive.org/download/GayatriMantra108TimesBhaanu/Gayatri%20Mantra%20108%20times%20-%20Bhaanu.mp3" },
-            { title: "Jai Ganesh Deva", cat: "Aarti", deity: "🐘", tag: "#Aarti", src: "https://archive.org/download/JaiGaneshJaiGaneshJaiGaneshDevaLordGaneshAarti/Jai%20Ganesh%20Jai%20Ganesh%20Jai%20Ganesh%20Deva%20-%20Lord%20Ganesh%20Aarti.mp3" },
-            { title: "Om Namah Shivaya", cat: "Bhajan", deity: "🔱", tag: "#Shiva", src: "https://archive.org/download/om-namah-shivay-dhoon/Om%20Namah%20Shivay%20Dhoon.mp3" },
-            { title: "Achyutam Keshavam", cat: "Bhajan", deity: "🪈", tag: "#Krishna", src: "https://archive.org/download/achyuta-ashtakam/Achyutashtakam.mp3" },
-            { title: "Om Jai Lakshmi Mata", cat: "Aarti", deity: "🪔", tag: "#Lakshmi", src: "https://archive.org/download/OmJaiLakshmiMataAarti/Om%20Jai%20Lakshmi%20Mata%20Aarti.mp3" },
-            { title: "Venkateswara Suprabhatam", cat: "Suprabhatam", deity: "⭐", tag: "#Balaji", src: "https://archive.org/download/SriVenkateswaraSuprabhatam/SriVenkateswaraSuprabhatam.mp3" },
+            { title: "Hanuman Chalisa", cat: "Chalisa", deity: "🙏", tag: "#Bhakti", videoId: "kC8VzzPPY2A" },
+            { title: "Om Jai Jagdish Hare", cat: "Aarti", deity: "🪷", tag: "#Aarti", videoId: "012oY38Blvg" },
+            { title: "Gayatri Mantra", cat: "Mantra", deity: "🔆", tag: "#Mantra", videoId: "ndZ-mBhkPrs" },
+            { title: "Jai Ganesh Deva", cat: "Aarti", deity: "🐘", tag: "#Aarti", videoId: "IJKafzL8kLQ" },
+            { title: "Om Namah Shivaya", cat: "Bhajan", deity: "🔱", tag: "#Shiva", videoId: "xBr9FxZQPjM" },
+            { title: "Achyutam Keshavam", cat: "Bhajan", deity: "🪈", tag: "#Krishna", videoId: "btOdAtmJBbw" },
+            { title: "Om Jai Lakshmi Mata", cat: "Aarti", deity: "🪔", tag: "#Lakshmi", videoId: "0D3VbBoJBrM" },
+            { title: "Venkateswara Suprabhatam", cat: "Suprabhatam", deity: "⭐", tag: "#Balaji", videoId: "TzJWmf0QCvY" },
         ];
 
-        // ── GREETING IMPLEMENTATION ──
+        // ── GREETING & SIDEBAR TITLE IMPLEMENTATION ──
         const h = new Date().getHours();
-        document.getElementById('greeting').textContent =
-            h < 12 ? "🌅 Good Morning — Hari Om" :
-                h < 17 ? "☀️ Good Afternoon — Jai Shri Ram" :
-                    "🌙 Good Evening — Om Shanti";
+        const greeting = document.getElementById('greeting');
+        const sbTitle = document.getElementById('sidebar-title');
+        
+        greeting.textContent = h < 12 ? "🌅 Good Morning — Hari Om" :
+                               h < 17 ? "☀️ Good Afternoon — Jai Shri Ram" :
+                               "🌙 Good Evening — Om Shanti";
 
-        // ── BUILD PLAYLIST (SIDEBAR) ──
-        const list = document.getElementById('song-list');
-        songs.forEach((s, i) => {
-            const el = document.createElement('div');
-            el.className = 'song-item';
-            el.id = `si-${i}`;
-            el.innerHTML = `
-                <div class="song-thumb">${s.deity}</div>
-                <div class="song-info">
-                  <div class="song-name">${s.title}</div>
-                  <div class="song-cat">${s.cat}</div>
-                </div>
-                <div class="song-dur">▶</div>`;
-            el.onclick = () => loadSong(i);
-            list.appendChild(el);
+        if (h >= 5 && h < 12) sbTitle.textContent = "🌅 MORNING PLAYLIST";
+        else if (h >= 12 && h < 17) sbTitle.textContent = "☀️ AFTERNOON PLAYLIST";
+        else if (h >= 17 && h < 21) sbTitle.textContent = "🌆 EVENING PLAYLIST";
+        else sbTitle.textContent = "🌙 NIGHT PLAYLIST";
+
+        let timeTag = "#Morning";
+        let timePeriod = "morning";
+        if (h >= 5 && h < 12) { timeTag = "#Morning"; timePeriod = "morning"; }
+        else if (h >= 12 && h < 17) { timeTag = "#Afternoon"; timePeriod = "afternoon"; }
+        else if (h >= 17 && h < 21) { timeTag = "#Evening"; timePeriod = "evening"; }
+        else { timeTag = "#Night"; timePeriod = "night"; }
+
+        // Update DOM initially
+        document.getElementById('now-sub').textContent = `Select a song to begin your ${timePeriod} prayer`;
+        document.querySelector('.now-tags').innerHTML = `<span class="tag">#Devotional</span><span class="tag" id="time-tag">${timeTag}</span>`;
+
+
+        let currentDeityFilter = "All";
+        let currentLangFilter = "All";
+        
+        // Wait for DOM
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.deity-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.deity-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentDeityFilter = btn.getAttribute('data-deity');
+                    renderPlaylist(document.getElementById('yt-search').value);
+                };
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentLangFilter = btn.getAttribute('data-lang');
+                    renderPlaylist(document.getElementById('yt-search').value);
+                };
+            });
         });
 
+        // ── BUILD PLAYLIST (SIDEBAR) ──
+        function renderPlaylist(filterText = "") {
+            const list = document.getElementById('song-list');
+            list.innerHTML = "";
+            const lowerFilter = filterText.toLowerCase();
+
+            let matchCount = 0;
+
+            songs.forEach((s, i) => {
+                if (filterText && !s.title.toLowerCase().includes(lowerFilter) && !s.cat.toLowerCase().includes(lowerFilter)) {
+                    return; // skip if doesn't match filter
+                }
+
+                let d = "";
+                if (s.title === "Hanuman Chalisa") d = "Hanuman";
+                else if (s.title === "Om Jai Jagdish Hare") d = "Vishnu";
+                else if (s.title === "Gayatri Mantra") d = "None";
+                else if (s.title === "Jai Ganesh Deva") d = "Ganesh";
+                else if (s.title === "Om Namah Shivaya") d = "Shiva";
+                else if (s.title === "Achyutam Keshavam") d = "Vishnu";
+                else if (s.title === "Om Jai Lakshmi Mata") d = "Devi";
+                else if (s.title === "Venkateswara Suprabhatam") d = "Vishnu";
+
+                if (currentDeityFilter !== "All" && d !== currentDeityFilter) {
+                    return;
+                }
+
+                let lg = "";
+                if (s.title === "Hanuman Chalisa") lg = "Hindi";
+                else if (s.title === "Om Jai Jagdish Hare") lg = "Hindi";
+                else if (s.title === "Gayatri Mantra") lg = "Sanskrit";
+                else if (s.title === "Jai Ganesh Deva") lg = "Hindi";
+                else if (s.title === "Om Namah Shivaya") lg = "Sanskrit";
+                else if (s.title === "Achyutam Keshavam") lg = "Hindi";
+                else if (s.title === "Om Jai Lakshmi Mata") lg = "Hindi";
+                else if (s.title === "Venkateswara Suprabhatam") lg = "Telugu";
+
+                if (currentLangFilter !== "All" && lg !== currentLangFilter) {
+                    return;
+                }
+
+                matchCount++;
+
+                const el = document.createElement('div');
+                el.className = 'song-item';
+                // Active class if currently playing
+                if (i === curr) el.classList.add('active');
+                
+                el.id = `si-${i}`;
+                el.innerHTML = `
+                    <div class="song-thumb">${s.deity}</div>
+                    <div class="song-info">
+                      <div class="song-name">${s.title}</div>
+                      <div class="song-cat">${s.cat}</div>
+                    </div>
+                    <div class="song-dur">▶</div>`;
+                el.onclick = () => loadSong(i);
+                list.appendChild(el);
+            });
+            
+            if (matchCount === 0) {
+                list.innerHTML = '<div id="no-songs-msg">No songs found</div>';
+            }
+        }
+        
         // ── PLAYER LOGIC ──
         const audio = document.getElementById('audio');
         let curr = -1;
+        let activePlaylist = songs; // Default to morning songs
+        let isSearchMode = false;
+
+        // Initial render
+        renderPlaylist();
+
+        // ── HOME RESET LOGIC ──
+        function resetToHome() {
+            // Stop playback
+            if (!audio.paused) audio.pause();
+            stopCurrentVideo();
+
+            document.getElementById('yt-player-container').style.display = 'none';
+            document.getElementById('yt-player-overlay').style.display = 'none';
+            
+            // Show default deity
+            document.getElementById('deity-art').style.display = 'flex';
+            
+            // Reset text
+            const npLabel = document.getElementById('now-playing-label');
+            if(npLabel) npLabel.style.display = 'none';
+            document.getElementById('now-title').textContent = "Bhakti Sangam";
+            document.getElementById('now-title').style.display = 'block';
+            document.getElementById('now-sub').textContent = `Select a song to begin your ${timePeriod} prayer`;
+            document.getElementById('now-sub').style.display = 'block';
+            document.querySelector('.now-tags').style.display = 'flex';
+            document.querySelector('.now-tags').innerHTML = `<span class="tag">#Devotional</span><span class="tag">${timeTag}</span>`;
+            
+            // Reset Bottom Bar
+            document.getElementById('bar-thumb').textContent = "🪔";
+            document.getElementById('bar-title').textContent = "Bhakti Sangam";
+            document.getElementById('bar-cat').textContent = "Devotional Player";
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('t-curr').textContent = '0:00';
+            document.getElementById('t-total').textContent = '0:00';
+            document.getElementById('play-btn').textContent = '▶';
+
+            // Clear search
+            document.getElementById('yt-search').value = "";
+            document.getElementById('search-results-container').style.display = 'none';
+            const resTitle = document.getElementById('search-res-title');
+            if (resTitle) resTitle.remove();
+            document.getElementById('back-to-results').style.display = 'none';
+            
+            // Clear sidebar highlight
+            curr = -1;
+            renderPlaylist();
+        }
+
+        document.querySelector('.top-left').style.cursor = 'pointer';
+        document.querySelector('.top-left').onclick = resetToHome;
 
         // ── YOUTUBE API SETUP ──
-        let ytPlayer;
-        let ytReady = false;
-        function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('yt-player', {
-                height: '100%',
-                width: '100%',
-                playerVars: {
-                    'autoplay': 1,
-                    'controls': 1, /* show controls so dad can click playlist menu */
-                    'rel': 0,
-                    'fs': 0
-                },
-                events: {
-                    'onReady': () => { ytReady = true; ytPlayer.setVolume(document.getElementById('vol').value * 100); },
-                    'onStateChange': onYtStateChange
-                }
+        let ytPlayer = null;
+
+        function stopCurrentVideo() {
+          if (ytPlayer) {
+            try {
+              if (typeof ytPlayer.stopVideo === 'function') ytPlayer.stopVideo();
+              if (typeof ytPlayer.destroy === 'function') ytPlayer.destroy();
+            } catch(e) {}
+            ytPlayer = null;
+          }
+          const container = document.getElementById('yt-player-div');
+          if (container) container.innerHTML = '';
+        }
+
+        let recentlyPlayed = []; // Store {title, type: 'song'|'yt', ...}
+
+        function addToRecent(item) {
+            // Remove if already exists (bring to top)
+            recentlyPlayed = recentlyPlayed.filter(r => r.title !== item.title);
+            recentlyPlayed.unshift(item);
+            if (recentlyPlayed.length > 5) recentlyPlayed.pop();
+            renderRecent();
+        }
+
+        function removeFromRecent(title) {
+            recentlyPlayed = recentlyPlayed.filter(r => r.title !== title);
+            renderRecent();
+        }
+
+        function renderRecent() {
+            const list = document.getElementById('recent-list');
+            const title = document.getElementById('recent-title');
+            if (recentlyPlayed.length === 0) {
+                title.style.display = 'none';
+                list.innerHTML = "";
+                return;
+            }
+            title.style.display = 'block';
+            list.innerHTML = "";
+            recentlyPlayed.forEach(r => {
+                const el = document.createElement('div');
+                el.className = 'recent-item';
+                
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'recent-title-txt';
+                titleSpan.textContent = r.title;
+                
+                const remBtn = document.createElement('span');
+                remBtn.className = 'recent-rem-btn';
+                remBtn.textContent = '×';
+                remBtn.title = 'Remove';
+                
+                el.onclick = () => {
+                    if (r.type === 'song') loadSong(r.index);
+                    else loadYtVideo(r.vId, r.title, r.channel);
+                };
+                
+                remBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removeFromRecent(r.title);
+                };
+                
+                el.appendChild(titleSpan);
+                el.appendChild(remBtn);
+                list.appendChild(el);
             });
         }
 
+        // Handle Browser Back Button
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.view === 'results') {
+                stopCurrentVideo();
+                showSearchResults();
+            } else if (e.state && e.state.view === 'player') {
+                // Stay in player
+            } else {
+                // Reset to Home if no state (back to initial)
+                resetToHome();
+            }
+        });
+        function onYouTubeIframeAPIReady() {
+            console.log("YouTube API Ready");
+        }
+
+        window.playNextFallback = () => {
+            document.getElementById('next-btn').click();
+        };
+
         function onYtStateChange(event) {
-            if (curr >= 0) return; // not focused on youtube
-
-            // Fetch video title if available
-            try {
-                const data = ytPlayer.getVideoData();
-                if (data && data.title) {
-                    document.getElementById('bar-title').textContent = data.title;
-                    document.getElementById('now-title').textContent = data.title;
+            if (event.data === YT.PlayerState.PLAYING) {
+                document.getElementById('play-btn').textContent = '⏸';
+            }
+            if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                document.getElementById('play-btn').textContent = '▶';
+                if (event.data === YT.PlayerState.ENDED) {
+                    document.getElementById('next-btn').click();
                 }
-            } catch(e) {}
-
-            if (event.data == YT.PlayerState.PLAYING) {
-                document.getElementById('play-btn').textContent = '⏸'; 
-                document.getElementById('idle-msg').textContent = '🎵 Now Playing...';
-            } else if (event.data == YT.PlayerState.PAUSED) {
-                document.getElementById('play-btn').textContent = '▶'; 
-                document.getElementById('idle-msg').textContent = '॥ Paused ॥';
-            } else if (event.data == YT.PlayerState.ENDED) {
-                // Playlist handles next automatically, but just in case
             }
         }
 
-        // Timer for YT Progress
+        // ── PROGRESS BAR TIMER ──
         setInterval(() => {
-            if (curr < 0 && ytReady && ytPlayer && ytPlayer.getPlayerState) {
-                if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-                    const cTime = ytPlayer.getCurrentTime() || 0;
-                    const dur = ytPlayer.getDuration() || 0;
-                    if (dur > 0) {
-                        document.getElementById('progress-fill').style.width = (cTime / dur * 100) + '%';
-                        document.getElementById('t-curr').textContent = fmt(cTime);
-                        document.getElementById('t-total').textContent = fmt(dur);
-                    }
-                }
-            }
-        }, 500);
+            if (!ytPlayer || !ytPlayer.getDuration) return;
+            const cur = ytPlayer.getCurrentTime();
+            const dur = ytPlayer.getDuration();
+            const pct = (cur / dur) * 100;
+            document.getElementById('progress-fill').style.width = pct + '%';
+            document.getElementById('t-curr').textContent = fmt(cur);
+            document.getElementById('t-total').textContent = fmt(dur);
+        }, 1000);
 
-        function loadSong(i) {
+        function loadSong(i, forceAutoplay = false) {
+            stopCurrentVideo();
             curr = i;
+            isSearchMode = false;
+            activePlaylist = songs;
             const s = songs[i];
             
-            // Hide YouTube player and Search Grid, Show Deity
-            document.getElementById('yt-player-container').style.display = 'none';
-            document.getElementById('back-to-results').style.display = 'none';
+            // UI setup
+            document.getElementById('deity-art').style.display = 'none';
             document.getElementById('search-results-container').style.display = 'none';
-            if(ytReady && typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo();
-            document.getElementById('deity-art').style.display = 'flex';
+            const resTitle = document.getElementById('search-res-title');
+            if (resTitle) resTitle.remove();
+            
+            document.getElementById('yt-player-container').style.display = 'block';
+            document.getElementById('back-to-results').style.display = 'none'; 
+            
+            const npLabel = document.getElementById('now-playing-label');
+            if(npLabel) npLabel.style.display = 'none';
             document.getElementById('now-title').style.display = 'block';
             document.getElementById('now-sub').style.display = 'block';
             document.querySelector('.now-tags').style.display = 'flex';
 
             document.querySelectorAll('.song-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`si-${i}`).classList.add('active');
-            document.getElementById('deity-art').textContent = s.deity;
+            const activeItem = document.getElementById(`si-${i}`);
+            if (activeItem) activeItem.classList.add('active');
+            
             document.getElementById('now-title').textContent = s.title;
             document.getElementById('now-sub').textContent = s.cat;
-            document.querySelector('.now-tags').innerHTML = `<span class="tag">${s.tag}</span><span class="tag">#Morning</span>`;
-            document.getElementById('idle-msg').textContent = '🎵 Now Playing...';
+            document.querySelector('.now-tags').innerHTML = `<span class="tag">${s.tag}</span><span class="tag">${timeTag}</span>`;
+            
             document.getElementById('bar-thumb').textContent = s.deity;
             document.getElementById('bar-title').textContent = s.title;
             document.getElementById('bar-cat').textContent = s.cat;
-            if (s.src) { audio.src = s.src; audio.play(); }
+            
+            const overlay = document.getElementById('yt-player-overlay');
+
+            const initPlayer = () => {
+                overlay.style.display = 'none'; 
+                
+                const vId = s.videoId;
+                const container = document.getElementById('yt-player-container');
+                let playerDiv = document.getElementById('yt-player-div');
+                if (!playerDiv) {
+                    playerDiv = document.createElement('div');
+                    playerDiv.id = 'yt-player-div';
+                    container.appendChild(playerDiv);
+                } else {
+                    // Recreate div to ensure a clean slate for new YT.Player
+                    const newDiv = document.createElement('div');
+                    newDiv.id = 'yt-player-div';
+                    playerDiv.replaceWith(newDiv);
+                }
+
+                ytPlayer = new YT.Player('yt-player-div', {
+                    videoId: vId,
+                    playerVars: { 
+                        autoplay: 1, 
+                        rel: 0, 
+                        modestbranding: 1,
+                        iv_load_policy: 3,
+                        disablekb: 0
+                    },
+                    events: {
+                        onStateChange: onYtStateChange,
+                        onError: function(e) {
+                            document.getElementById('yt-player-div')
+                                .outerHTML = `
+                                <div id="yt-player-div" style="display:flex; flex-direction:column; 
+                                align-items:center; justify-content:center; 
+                                height:100%; background:#1A0D00; 
+                                border-radius:12px; gap:16px; position:absolute; inset:0; z-index:10;">
+                                  <div style="font-size:4rem">🪔</div>
+                                  <div style="color:#FFB300; font-size:1.1rem; 
+                                  font-weight:bold; text-align:center">
+                                    This song is not available here
+                                  </div>
+                                  <div style="color:#8B5E3C; font-size:0.85rem; 
+                                  text-align:center">
+                                    Please select another song from Up Next
+                                  </div>
+                                </div>`;
+                        }
+                    }
+                });
+
+                document.getElementById('vol').oninput = function() {
+                  if (ytPlayer && ytPlayer.setVolume) {
+                    ytPlayer.setVolume(this.value * 100);
+                  }
+                };
+
+                if (!audio.paused) audio.pause();
+                addToRecent({ title: s.title, type: 'song', index: i });
+            };
+
+            if (forceAutoplay) {
+                initPlayer();
+            } else {
+                // Show overlay instead of loading iframe directly
+                overlay.style.display = 'block';
+                overlay.style.backgroundImage = `url('https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg')`;
+                overlay.onclick = initPlayer;
+            }
         }
 
         document.getElementById('play-btn').onclick = () => {
-            if (curr < 0) {
-                // handle YT Play/Pause
-                if (ytReady && typeof ytPlayer.getPlayerState === 'function') {
-                    if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
-                    else ytPlayer.playVideo();
+            if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
+                const state = ytPlayer.getPlayerState();
+                if (state === 1) { // 1 = PLAYING
+                    ytPlayer.pauseVideo();
                 } else {
-                    loadSong(0); 
+                    ytPlayer.playVideo();
                 }
-                return; 
             }
-            audio.paused ? audio.play() : audio.pause();
         };
 
         document.getElementById('next-btn').onclick = () => {
-            if (curr < 0 && ytReady && typeof ytPlayer.nextVideo === 'function') { ytPlayer.nextVideo(); return; }
-            loadSong((curr + 1) % songs.length);
+            stopCurrentVideo();
+
+            if (isSearchMode) {
+                curr = (curr + 1) % activePlaylist.length;
+                const nextVid = activePlaylist[curr];
+                loadYtVideo(nextVid.id.videoId, nextVid.snippet.title, nextVid.snippet.channelTitle);
+            } else {
+                curr = (curr + 1) % songs.length;
+                loadSong(curr, true);
+            }
         }
         document.getElementById('prev-btn').onclick = () => {
-            if (curr < 0 && ytReady && typeof ytPlayer.previousVideo === 'function') { ytPlayer.previousVideo(); return; }
-            loadSong((curr - 1 + songs.length) % songs.length);
+            stopCurrentVideo();
+
+            if (isSearchMode) {
+                curr = (curr - 1 + activePlaylist.length) % activePlaylist.length;
+                const prevVid = activePlaylist[curr];
+                loadYtVideo(prevVid.id.videoId, prevVid.snippet.title, prevVid.snippet.channelTitle);
+            } else {
+                curr = (curr - 1 + songs.length) % songs.length;
+                loadSong(curr, true);
+            }
         }
 
         audio.ontimeupdate = () => {
@@ -154,10 +439,10 @@
         };
         audio.onended = () => { if(curr >= 0) loadSong((curr + 1) % songs.length); };
         audio.onplay = () => { 
-            if(curr >= 0) { document.getElementById('play-btn').textContent = '⏸'; document.getElementById('idle-msg').textContent = '🎵 Now Playing...'; }
+            if(curr >= 0) { document.getElementById('play-btn').textContent = '⏸'; }
         };
         audio.onpause = () => { 
-            if(curr >= 0) { document.getElementById('play-btn').textContent = '▶'; document.getElementById('idle-msg').textContent = '॥ Paused ॥'; }
+            if(curr >= 0) { document.getElementById('play-btn').textContent = '▶'; }
         };
 
         document.getElementById('vol').oninput = e => {
@@ -251,16 +536,11 @@ Tone rules:
             }
         }
 
-        const EMBEDDED_API_KEY = "AIzaSyBCB9FvGsT1bg-rxRpujG3h930f7qTs4sk"; // PASTE YOUR KEY HERE for personal use
+        const GEMINI_API_KEY = "";
+        const YT_API_KEY = "";
 
         async function handleSendMsg(text) {
             if (!text.trim()) return;
-            
-            let apiKey = EMBEDDED_API_KEY;
-            if (!apiKey) {
-                alert("Please set EMBEDDED_API_KEY in the code.");
-                return;
-            }
 
             addMsgToUI('user', text);
             document.getElementById('chat-input').value = '';
@@ -279,7 +559,7 @@ Tone rules:
             chatHistory.push({ role: 'user', text: text });
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                const response = await fetch(`/api/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -318,6 +598,12 @@ Tone rules:
         }
         // ── YOUTUBE SEARCH LOGIC ──
         document.getElementById('yt-search-btn').onclick = () => handleYtSearch();
+        
+        // Listen to input changes for sidebar filtering as well as Enter for yt search
+        document.getElementById('yt-search').addEventListener('input', function(e) {
+            renderPlaylist(this.value);
+        });
+        
         document.getElementById('yt-search').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') handleYtSearch();
         });
@@ -330,103 +616,116 @@ Tone rules:
             
             // UI State Change: Searching...
             if (!audio.paused) audio.pause();
-            if (ytReady && typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo();
+            if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo();
             
             document.querySelectorAll('.song-item').forEach(el => el.classList.remove('active'));
             curr = -1;
             
+            document.getElementById('center').classList.remove('playback-layout');
             document.getElementById('deity-art').style.display = 'none';
             document.getElementById('yt-player-container').style.display = 'none';
+            document.getElementById('yt-player-overlay').style.display = 'none'; 
+            const npLabel = document.getElementById('now-playing-label');
+            if(npLabel) npLabel.style.display = 'none';
             document.getElementById('now-title').style.display = 'none';
             document.getElementById('now-sub').style.display = 'none';
             document.querySelector('.now-tags').style.display = 'none';
-            document.getElementById('idle-msg').textContent = '🎵 Searching YouTube for ' + val + '...';
-            
+            document.getElementById('center').style.justifyContent = 'flex-start';
             const resultsBox = document.getElementById('search-results-container');
+            resultsBox.classList.remove('more-results-mode'); // Vertical for initial search
             resultsBox.style.display = 'flex';
-            resultsBox.innerHTML = '<div style="text-align:center; color:#FFB300; margin-top:2rem;">Searching...</div>';
+            resultsBox.innerHTML = '<div style="text-align:center; color:#FFB300; margin-top:2rem;">Searching YouTube instantly...</div>';
 
-            const apiKey = window.EMBEDDED_API_KEY || EMBEDDED_API_KEY;
-            
             try {
-                // Fetch youtube search results reliably using the injected Gemini API Key with Google Search tool enabled
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ role: 'user', parts: [{ text: `Search YouTube for "${val}" and return exactly 5 relevant video results. Output ONLY a valid JSON array of objects with the keys: "id" (the youtube video id string), "title" (the video title), "channel" (the uploader channel name), "thumb" (string formatting: https://i.ytimg.com/vi/<id>/hqdefault.jpg), and "length" (estimated duration like "4:32" or "Live"). Do not include markdown blocks.` }] }],
-                        systemInstruction: { parts: [{ text: "You are a youtube search API. Always output RAW JSON only." }] },
-                        tools: [ { googleSearch: {} } ]
-                    })
-                });
-                
+                // Fetch from Local Proxy
+                const url = `/api/search?q=${encodeURIComponent(val)}`;
+                const res = await fetch(url);
                 const responseData = await res.json();
                 
                 if (responseData.error) throw new Error(responseData.error.message);
-                
-                let jsonText = responseData.candidates[0].content.parts[0].text.trim();
-                // Strip markdown backticks if Gemini includes them anyway
-                if (jsonText.startsWith('```json')) jsonText = jsonText.substring(7);
-                if (jsonText.startsWith('```')) jsonText = jsonText.substring(3);
-                if (jsonText.endsWith('```')) jsonText = jsonText.substring(0, jsonText.length - 3);
-                
-                const videos = JSON.parse(jsonText.trim());
+                if (!responseData.items || responseData.items.length === 0) throw new Error("No videos found.");
 
-                if (!videos || videos.length === 0) throw new Error("No videos found.");
-
+                activePlaylist = responseData.items; // Store for navigation
+                isSearchMode = true;
                 resultsBox.innerHTML = '';
                 
-                let resultsTitle = document.createElement('h3');
-                resultsTitle.style.color = '#FFB300';
-                resultsTitle.style.fontSize = '1.1rem';
-                resultsTitle.style.paddingLeft = '0.5rem';
-                resultsTitle.style.marginBottom = '0.5rem';
-                resultsTitle.style.fontFamily = "'Yatra One', cursive";
-                resultsTitle.textContent = "Search Results: " + val;
-                resultsBox.appendChild(resultsTitle);
+                // Clear any existing search title if it exists from previous search
+                const oldTitle = document.getElementById('search-res-title');
+                if(oldTitle) oldTitle.remove();
 
-                videos.forEach(v => {
+                let resultsTitle = document.createElement('div');
+                resultsTitle.id = 'search-res-title';
+                resultsTitle.textContent = "Recommended Devotional Videos";
+                resultsBox.before(resultsTitle); 
+
+                responseData.items.forEach((item, index) => {
+                    const videoId = item.id.videoId;
+                    const title = item.snippet.title;
+                    const channel = item.snippet.channelTitle;
+                    // Get highest available thumbnail resolution we can easily grab
+                    const thumb = item.snippet.thumbnails.high ? item.snippet.thumbnails.high.url : 
+                                 (item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url);
+
                     const card = document.createElement('div');
                     card.className = 'yt-card';
                     card.innerHTML = `
-                        <img src="${v.thumb}" class="yt-thumb" alt="thumbnail" />
+                        <img src="${thumb}" class="yt-thumb" alt="thumbnail" />
                         <div class="yt-info">
-                            <div class="yt-title">${v.title}</div>
+                            <div class="yt-title" title="${title}">${title}</div>
                             <div class="yt-meta">
-                                <span>👤 ${v.channel}</span>
-                                <span class="yt-dur-pill">⏱ ${v.length || 'Video'}</span>
+                                <span>👤 ${channel}</span>
+                                <span class="yt-dur-pill">▶ Play</span>
                             </div>
                         </div>
                     `;
-                    card.onclick = () => loadYtVideo(v.id, v.title, v.channel);
+                    card.onclick = () => {
+                        curr = index; // Set index for search navigation
+                        loadYtVideo(videoId, title, channel);
+                        history.pushState({ view: 'player', videoId: videoId }, "", "");
+                    };
                     resultsBox.appendChild(card);
                 });
                 
-                document.getElementById('idle-msg').textContent = '🎵 Select a song from the results above.';
                 document.getElementById('yt-search').blur();
+
+                // Push history for results view
+                history.pushState({ view: 'results', query: val }, "", "");
 
             } catch (err) {
                 console.error(err);
-                resultsBox.innerHTML = `<div style="text-align:center; color:#FFB300;">Error loading results. Try searching again.</div>`;
-                document.getElementById('idle-msg').textContent = '🙏 May your morning be blessed.';
+                resultsBox.innerHTML = `<div style="text-align:center; color:#FFB300;">Error: ${err.message || 'Error loading results.'}</div>`;
             }
         }
 
         // When user clicks a card, play that specific video in the top embed
         function loadYtVideo(vId, vTitle, channelName) {
-            document.getElementById('search-results-container').style.display = 'none';
+            stopCurrentVideo();
+            // Hide overlay if it's there
+            document.getElementById('yt-player-overlay').style.display = 'none';
+            
+            document.getElementById('center').classList.add('playback-layout');
             document.getElementById('yt-player-container').style.display = 'block';
-            document.getElementById('back-to-results').style.display = 'block';
+            document.getElementById('back-to-results').style.display = 'block'; // Show back button
             
-            document.getElementById('now-title').style.display = 'block';
+            const resultsBox = document.getElementById('search-results-container');
+            resultsBox.classList.add('more-results-mode'); // Show results as compact vertical list
+            resultsBox.style.display = 'flex';
+            const resTitle = document.getElementById('search-res-title');
+            if (resTitle) resTitle.textContent = "UP NEXT";
+
+            const npLabel = document.getElementById('now-playing-label');
+            if(npLabel) npLabel.style.display = 'block';
+
+            const nowTitle = document.getElementById('now-title');
+            nowTitle.style.display = 'block';
+            nowTitle.style.fontSize = ''; 
+            nowTitle.textContent = vTitle;
+            
             document.getElementById('now-sub').style.display = 'block';
-            document.querySelector('.now-tags').style.display = 'flex';
+            document.getElementById('now-sub').textContent = channelName;
             
-            document.getElementById('now-title').textContent = "YouTube Audio Match";
-            document.getElementById('now-sub').textContent = vTitle;
-            document.querySelector('.now-tags').innerHTML = `<span class="tag">#YouTube</span><span class="tag">${channelName}</span>`;
-            document.getElementById('idle-msg').textContent = '🎵 Playing your selection...';
-            
+            const nowTags = document.querySelector('.now-tags');
+            if(nowTags) nowTags.style.display = 'none';
             document.getElementById('bar-thumb').textContent = "▶";
             document.getElementById('bar-title').textContent = vTitle;
             document.getElementById('bar-cat').textContent = channelName;
@@ -434,31 +733,145 @@ Tone rules:
             document.getElementById('t-curr').textContent = '0:00';
             document.getElementById('t-total').textContent = '0:00';
 
-            if(ytReady && typeof ytPlayer.loadVideoById === 'function') {
-                ytPlayer.loadVideoById(vId);
+            const container = document.getElementById('yt-player-container');
+            let playerDiv = document.getElementById('yt-player-div');
+            if (!playerDiv) {
+                playerDiv = document.createElement('div');
+                playerDiv.id = 'yt-player-div';
+                container.appendChild(playerDiv);
+            } else {
+                const newDiv = document.createElement('div');
+                newDiv.id = 'yt-player-div';
+                playerDiv.replaceWith(newDiv);
             }
+
+            ytPlayer = new YT.Player('yt-player-div', {
+                videoId: vId,
+                playerVars: { 
+                    autoplay: 1, 
+                    rel: 0, 
+                    modestbranding: 1,
+                    iv_load_policy: 3,
+                    disablekb: 0
+                },
+                events: {
+                    onStateChange: onYtStateChange,
+                    onError: function(e) {
+                            document.getElementById('yt-player-div')
+                                .outerHTML = `
+                                <div id="yt-player-div" style="display:flex; flex-direction:column; 
+                                align-items:center; justify-content:center; 
+                                height:100%; background:#1A0D00; 
+                                border-radius:12px; gap:16px; position:absolute; inset:0; z-index:10;">
+                                  <div style="font-size:4rem">🪔</div>
+                                  <div style="color:#FFB300; font-size:1.1rem; 
+                                  font-weight:bold; text-align:center">
+                                    This song is not available here
+                                  </div>
+                                  <div style="color:#8B5E3C; font-size:0.85rem; 
+                                  text-align:center">
+                                    Please select another song from Up Next
+                                  </div>
+                                </div>`;
+                    }
+                }
+            });
+
+            document.getElementById('vol').oninput = function() {
+              if (ytPlayer && ytPlayer.setVolume) {
+                ytPlayer.setVolume(this.value * 100);
+              }
+            };
+
+            addToRecent({ title: vTitle, type: 'yt', vId: vId, channel: channelName });
         }
 
-// ── GO BACK TO RESULTS LOGIC ──
-function goBackToResults() {
-    // Hide YT player
+// ── SHOW SEARCH RESULTS LOGIC ──
+function showSearchResults() {
+    // Hide YT player / overlay
+    document.getElementById('center').classList.remove('playback-layout');
     document.getElementById('yt-player-container').style.display = 'none';
+    document.getElementById('yt-player-overlay').style.display = 'none';
     document.getElementById('back-to-results').style.display = 'none';
     
-    // Pause video
-    if (ytReady && typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo();
+    // Show results vertical again
+    const resultsBox = document.getElementById('search-results-container');
+    resultsBox.classList.remove('more-results-mode');
+    resultsBox.style.display = 'flex';
+    
+    // Update title back to original
+    const resTitle = document.getElementById('search-res-title');
+    if (resTitle) resTitle.textContent = "Recommended Devotional Videos";
+
+    // Stop and remove video completely
+    const playerDiv = document.getElementById('yt-player-div');
+    if (playerDiv) {
+        playerDiv.innerHTML = "";
+    }
+    if (ytPlayer && typeof ytPlayer.stopVideo === 'function') ytPlayer.stopVideo();
     
     // Show results
     document.getElementById('search-results-container').style.display = 'flex';
-    document.getElementById('idle-msg').textContent = '🎵 Select a song from the results above.';
     
     // Hide now playing stuff temporarily
+    const npLabel = document.getElementById('now-playing-label');
+    if(npLabel) npLabel.style.display = 'none';
     document.getElementById('now-title').style.display = 'none';
     document.getElementById('now-sub').style.display = 'none';
-    document.querySelector('.now-tags').style.display = 'none';
+    const nowTags = document.querySelector('.now-tags');
+    if(nowTags) nowTags.style.display = 'none';
     
     // reset bottom bar temporarily
     document.getElementById('bar-thumb').textContent = '▶';
     document.getElementById('bar-title').textContent = 'Making a selection...';
     document.getElementById('bar-cat').textContent = 'YouTube Search';
+}
+
+// ── MOBILE TOGGLE LOGIC ──
+const mobMenuBtn = document.getElementById('mobile-menu-btn');
+const mobAiBtn = document.getElementById('mobile-ai-btn');
+const mobileOverlay = document.getElementById('mobile-overlay');
+const mobSidebar = document.getElementById('sidebar');
+const mobAiSidebar = document.getElementById('ai-sidebar');
+const upNextBtn = document.getElementById('mobile-up-next-btn');
+
+if(mobMenuBtn) {
+    mobMenuBtn.onclick = () => {
+        mobSidebar.classList.add('mobile-open');
+        if(mobileOverlay) mobileOverlay.classList.add('active');
+    };
+}
+if(mobAiBtn) {
+    mobAiBtn.onclick = () => {
+        mobAiSidebar.classList.add('mobile-open');
+        if(mobileOverlay) mobileOverlay.classList.add('active');
+    };
+}
+if(mobileOverlay) {
+    mobileOverlay.onclick = () => {
+        mobSidebar.classList.remove('mobile-open');
+        mobAiSidebar.classList.remove('mobile-open');
+        mobileOverlay.classList.remove('active');
+        
+        const resultsBox = document.getElementById('search-results-container');
+        if(resultsBox && resultsBox.classList.contains('bottom-sheet')) {
+            resultsBox.classList.remove('bottom-sheet');
+            if(upNextBtn) upNextBtn.textContent = '⬆ Show Up Next';
+        }
+    };
+}
+
+if(upNextBtn) {
+    upNextBtn.onclick = () => {
+        const resultsBox = document.getElementById('search-results-container');
+        if(resultsBox.classList.contains('bottom-sheet')) {
+            resultsBox.classList.remove('bottom-sheet');
+            upNextBtn.textContent = '⬆ Show Up Next';
+            mobileOverlay.classList.remove('active');
+        } else {
+            resultsBox.classList.add('bottom-sheet');
+            upNextBtn.textContent = '⬇ Hide Up Next';
+            mobileOverlay.classList.add('active');
+        }
+    };
 }
